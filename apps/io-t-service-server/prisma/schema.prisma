@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Device {
+  createdAt   DateTime          @default(now())
+  id          String            @id @default(cuid())
+  name        String?
+  ruleEngines RuleEngine[]
+  sensors     Sensor[]
+  status      EnumDeviceStatus?
+  typeField   String?
+  updatedAt   DateTime          @updatedAt
+}
+
+model Sensor {
+  createdAt   DateTime     @default(now())
+  dataStreams DataStream[]
+  description String?
+  device      Device?      @relation(fields: [deviceId], references: [id])
+  deviceId    String?
+  id          String       @id @default(cuid())
+  model       String?
+  updatedAt   DateTime     @updatedAt
+}
+
+model RuleEngine {
+  action    Json?
+  condition Json?
+  createdAt DateTime @default(now())
+  device    Device?  @relation(fields: [deviceId], references: [id])
+  deviceId  String?
+  id        String   @id @default(cuid())
+  ruleName  String?
+  updatedAt DateTime @updatedAt
+}
+
+model DataStream {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  sensor    Sensor?   @relation(fields: [sensorId], references: [id])
+  sensorId  String?
+  timestamp DateTime?
+  updatedAt DateTime  @updatedAt
+  value     Float?
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumDeviceStatus {
+  Option1
+}
